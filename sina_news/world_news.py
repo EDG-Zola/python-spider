@@ -67,31 +67,35 @@ def getListLinks(page_news_url):
 #callback=newsloadercallback&_=1531207624777'
 #getListLinks(url)
 
-
-#整合所有，抓取每一条国际新闻的所有内容
-##1.产生每一条新闻的链接
-url = 'http://api.roll.news.sina.com.cn/zt_list?channel=news&cat_1=gjxw&level==1||=2&\
+def main():
+        
+    #整合所有，抓取每一条国际新闻的所有内容
+    ##1.产生每一条新闻的链接
+    url = 'http://api.roll.news.sina.com.cn/zt_list?channel=news&cat_1=gjxw&level==1||=2&\
 show_ext=1&show_all=1&show_num=22&tag=1&format=json&page={}&\
 callback=newsloadercallback&_=1531207624777'#这里用{}换page=1中的1
 
-news_link_total = []
-news_total = []
-for i in range(1,6): #产生1-5页的所有新闻的链接
-    fromat = url.format(i)
-    news_link_total.extend(getListLinks(url.format(i))) #用extend方法而不是append方法
+    news_link_total = []
+    news_total = []
+    for i in range(1,6): #产生1-5页的所有新闻的链接
+        fromat = url.format(i)
+        news_link_total.extend(getListLinks(url.format(i))) #用extend方法而不是append方法
     
-##2.使用for循环，获取每一条新闻链接里面的内容
-for single_news_url in news_link_total:
-    #news_comments_url = 'http://comment5.news.sina.com.cn/page/info?version=1&format=json&channel=gj&\
-    #newsid=comos-{}&group=undefined&compress=0&ie=utf-8&oe=utf-8&page=1&page_size=3&t_size=3&\
-    #h_size=3&thread=1' #把newsid部分用{}替换掉
-    
-    news_comments_url = 'http://comment5.news.sina.com.cn/page/info?version=1&format=json&channel=gj&\
+    ##2.使用for循环，获取每一条新闻链接里面的内容
+    for single_news_url in news_link_total:
+        #news_comments_url = 'http://comment5.news.sina.com.cn/page/info?version=1&format=json&channel=gj&\
+        #newsid=comos-{}&group=undefined&compress=0&ie=utf-8&oe=utf-8&page=1&page_size=3&t_size=3&\
+        #h_size=3&thread=1' #把newsid部分用{}替换掉
+        
+        news_comments_url = 'http://comment5.news.sina.com.cn/page/info?version=1&format=json&channel=gj&\
 newsid=comos-{}&group=undefined&compress=0&ie=utf-8&oe=utf-8&page=1&\
 page_size=3&t_size=3&h_size=3&thread=1'
-    news_total.append(getNewsContend(single_news_url))#每一个链接返回一个字典
+        news_total.append(getNewsContend(single_news_url))#每一个链接返回一个字典
     
-##3.使用pandas整理数据
-df = pd.DataFrame(news_total)
-df.to_excel('sina_world_news.xlsx')
-
+    ##3.使用pandas整理数据
+    df = pd.DataFrame(news_total)
+    df.to_excel('sina_world_news.xlsx')
+    
+if __name__ == '__main__':
+    main()
+    print('finished')
