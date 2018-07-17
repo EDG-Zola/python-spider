@@ -88,13 +88,14 @@ def get_page_detail(url):
         return None
 
 
-def download_img(url):
+def download_img(url, file_name):
     '''
     Desc:
         下载图片到指定的文件file_name中
     param:
         url -- 每一张图片的url
     '''
+    print("正在下载", url)
     try:
         headers = {
             'user-agent':'Mozilla/5.0'
@@ -103,12 +104,7 @@ def download_img(url):
 #         res.encoding = 'utf-8'
         #返回的状态码是整型
         if res.status_code == 200:
-            #在当前路径images路径下存储图片，图片命名为md5的格式+jpg
-            if not os.path.exists('images'):
-                os.mkdir('images')
-            file_name = '{0}/{1}/{2}.{3}'.format(os.getcwd(), 'images', \
-                         md5(res.content).hexdigest(), 'jpg')
-            print("正在下载", url, " ", file_name) #打印当前下载的图片的url
+            
             if not os.path.exists(file_name):
                 with open(file_name, 'wb') as f:
                     f.write(res.content) #图片信息为二进制数据，所以为调用content方法
@@ -118,14 +114,15 @@ def download_img(url):
         print("下载图片出错")
         return None
     
-    
-def parse_page_detail(html, url):
+i=1 #图片名称索引   
+def parse_page_detail(html, url, file_name):
     '''
     Desc:
         解析组图详情页的内容，返回组图详情页的标题，详情页里面的图片，详情页的url
     param:
         html -- 组图详情页的html内容 
         url -- 组图详情页的链接
+        file_name -- 存储图片的目录
     return:
         一个字典 -- 
         {
@@ -149,7 +146,10 @@ def parse_page_detail(html, url):
             sub_images = data.get('sub_images')
             images = [item.get('url') for item in sub_images]
             for image in images:
-                download_img(image)
+                global i #声明图片名称索引为全局变量
+                image_name = '{0}{1}{2}'.format(file_name, str(i), '.jpg')
+                download_img(image, image_name)
+                i += 1
             return {
                 'title': title, #街拍详情页的标题
                 'images':images, #街拍详情页的组图图片
@@ -158,18 +158,36 @@ def parse_page_detail(html, url):
 
 
 def main(offset):
-    html = get_page_index(offset, '街拍')
+    '''
+    Desc:
+        抓取头条街拍组图，将每一张图片存储到目录path下，并将组图标题，
+        每一张图片的链接，组图详情页的链接存储到result.json中
+    param:
+        offset -- Ajax动态加载的分页偏置
+    '''
+    #在当前路径images路径下存储图片，图片命名为md5的格式+jpg
+    keyword = '街拍' #可修改搜索关键字
+    path = "I:/文档/爬虫数据/images" #图片存储目录
+    if not os.path.exists(path):
+        os.mkdir(path)
+    file_name = '{0}/'.format(path)
+    html = get_page_index(offset, keyword)
+    #遍历每一个详情页
     for url in parse_page_index(html):
-        print(url)
+        #获得每一个详情页html内容
         html = get_page_detail(url)
         if html:
-            result = parse_page_detail(html, url) #返回一个带有键title,images,url的字典
+            #解析详情页中的图片
+            result = parse_page_detail(html, url, file_name) #返回一个带有键title,images,url的字典
+            #把带有键title,images,url的字典存储到result.json中
+            with open('result.json', 'a', encoding='utf-8') as f:
+                f.write(json.dumps(result, ensure_ascii=False) + '\n')
 
 if __name__ == '__main__':
     start_time = time.time()
     pool = Pool()
-    group_start = 1
-    group_end = 20  #修改此处来抓取Ajax加载的图片
+    group_start = 0
+    group_end = 1  #修改此处来抓取Ajax加载的图片
     groups = [x*20 for x in range(group_start, group_end)] 
     pool.map(main, groups)
     end_time = time.time()
