@@ -16,6 +16,10 @@ import  pymongo
 
 client = pymongo.MongoClient(MONGO_URL) #创建一个MONGO客户端
 db = client[MONGO_DB] #指定一个数据库
+
+#不过，截止目前2018.07.21，selenium已经不在只是PhantomJS了，我们还是乖乖使用Chrome吧
+# browser = webdriver.PhantomJS(service_args=SERVICE_ARGS)
+# browser.set_window_size(1400,900)#设置窗口大小
 browser = webdriver.Chrome()
 wait = WebDriverWait(browser, 10) #等待
 keyword = '美食'
