@@ -2,4 +2,7 @@
 .ipython
 .pylint.d
 .spyder-py3
+.idea
+.matplotlib
+__pycache__
 

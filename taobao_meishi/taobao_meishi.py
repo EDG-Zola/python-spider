@@ -11,8 +11,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from bs4 import BeautifulSoup
+from configure import *
+import  pymongo
 
-
+client = pymongo.MongoClient(MONGO_URL) #创建一个MONGO客户端
+db = client[MONGO_DB] #指定一个数据库
 browser = webdriver.Chrome()
 wait = WebDriverWait(browser, 10) #等待
 keyword = '美食'
@@ -68,7 +71,7 @@ def next_page(page_number):
             EC.text_to_be_present_in_element((By.CSS_SELECTOR, \
                                               '#mainsrp-pager > div > div > div > ul > li.item.active > span'), str(page_number))
                   )
-        get_products()
+        get_products() #解析每一页产品的信息
     #发生延时异常时，重新调用next_page(page_number)方法
     except TimeoutException:
         next_page(page_number)
@@ -95,6 +98,14 @@ def get_products():
             'location': item.select('.location')[0].text.strip()
         }
         print(product)
+        save_to_mongo(product) #保存到Mongo数据库中
+
+def save_to_mongo(result):
+    try:
+        if db[MONGO_TABLE].insert(result):
+            print('存储到Mongo数据库成功', result)
+    except Exception:
+        print('存储到Mongo数据库失败', result)
 
 
 def main():
@@ -103,7 +114,8 @@ def main():
     #也可以使用正则表达式, \d表示匹配任意的一个10进制数，+表示匹配前边的原子1次或多次
     #total = int(re.compile('(\d+)').search(total).group(1))
     total = int(total.lstrip('共 ').rstrip(' 页，'))
-    for i in range(1,total):
+    #这里只模拟前两页页
+    for i in range(1,3):
         next_page(i)
 
 
