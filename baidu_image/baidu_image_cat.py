@@ -104,52 +104,58 @@ def download_one_image(url, file_name):
         print("下载图片出错")
 
 
-i=1
-# image_urls = []
-def main(page):
-    # global image_urls
-    global i
-    html = get_page_index(page, '猫')
-    for url in parse_page_index(html):
-        path = "I:/文档/爬虫数据/baidu_cat_images" #图片存储目录
-        if not os.path.exists(path):
-            os.mkdir(path)
-        file_name = '{0}/{1}{2}'.format(path, i, '.jpg')
-        download_one_image(url, file_name)
+# i=1
+# # image_urls = []
+# def main(page):
+#     # global image_urls
+#     global i
+#     html = get_page_index(page, '猫')
+#     for url in parse_page_index(html):
+#         path = "I:/文档/爬虫数据/baidu_cat_images" #图片存储目录
+#         if not os.path.exists(path):
+#             os.mkdir(path)
+#         file_name = '{0}/{1}{2}'.format(path, i, '.jpg')
+#         download_one_image(url, file_name)
         # image_url = {}
         # image_url[str(i)] = url
         # image_urls.append(image_url)
-        i += 1
+        # i += 1
     # with open('result.json', 'a', encoding='utf-8') as f:
     #         f.write(json.dumps(image_urls, ensure_ascii=False) + '\n')
 
 
-if __name__ == '__main__':
-    start_page = 1
-    end_page = 3
-    groups = [i*30 for i in range(start_page, end_page)]
-    start_time = time.time()
-    pool = Pool()
-    pool.map(main, groups)
-    end_time = time.time()
-    print("cost time : %.2fs" % (end_time-start_time))
-
-
-# def main():
-#     i=1
-#     image_urls = []
+# if __name__ == '__main__':
 #     start_page = 1
 #     end_page = 3
-#     for page in range(start_page, end_page):
-#         html = get_page_index(30*page, '猫')
-#         for url in parse_page_index(html):
-#             print(url)
-#             path = "I:/文档/爬虫数据/baidu_cat_images" #图片存储目录
-#             file_name = '{0}/{1}{2}'.format(path, i, '.jpg')
-#             download_one_image(url, file_name)
-#             image_url = {}
-#             image_url[str(i)] = url
-#             image_urls.append(image_url)
-#             i += 1
-#     with open('result.json', 'a', encoding='utf-8') as f:
-#             f.write(json.dumps(image_urls, ensure_ascii=False) + '\n')
+#     groups = [i*30 for i in range(start_page, end_page)]
+#     start_time = time.time()
+#     pool = Pool()
+#     pool.map(main, groups)
+#     end_time = time.time()
+#     print("cost time : %.2fs" % (end_time-start_time))
+
+
+def main():
+    i=1
+    image_urls = []
+    start_page = 1
+    end_page = 3
+    for page in range(start_page, end_page):
+        html = get_page_index(30*page, '猫')
+        for url in parse_page_index(html):
+            print(url)
+            path = "I:/文档/爬虫数据/baidu_cat_images" #图片存储目录
+            file_name = '{0}/{1}{2}'.format(path, i, '.jpg')
+            download_one_image(url, file_name)
+            image_url = {}
+            image_url[str(i)] = url
+            image_urls.append(image_url)
+            i += 1
+    with open('result.json', 'w', encoding='utf-8') as f:
+            f.write(json.dumps(image_urls, ensure_ascii=False) + '\n')
+
+if __name__ == '__main__':
+    start_time = time.time()
+    main()
+    end_time = time.time()
+    print("cost time : %.2fs" % (end_time-start_time))
